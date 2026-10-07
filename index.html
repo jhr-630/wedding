@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>본식 당일 체크리스트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: single readable column, sticky progress bar, section jump chips, check rows grouped by section */
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#1d2433; --muted:#667085; --line:#e3e6ec;
+  --accent:#a8566a; --accent-soft:#f6e8ec; --done:#9aa3b2;
+  --display:"Gowun Batang", "Nanum Myeongjo", serif;
+  --body:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14171e; --surface:#1c2029; --ink:#e8eaf0; --muted:#9aa2b3; --line:#2b313d;
+  --accent:#e49aae; --accent-soft:#3a2730; --done:#6b7385; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171e; --surface:#1c2029; --ink:#e8eaf0; --muted:#9aa2b3; --line:#2b313d;
+  --accent:#e49aae; --accent-soft:#3a2730; --done:#6b7385; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;margin:0}
+.wrap{max-width:720px;margin:0 auto;padding:32px 16px 80px}
+header h1{font-family:var(--display);font-weight:700;font-size:1.9rem;line-height:1.25;margin:0 0 6px;text-wrap:balance}
+header p{color:var(--muted);margin:0;font-size:.92rem}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;margin-top:18px;border-bottom:1px solid var(--line)}
+.prog{display:flex;align-items:center;gap:12px;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.track{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;background:var(--accent);transition:width .25s}
+.chips{display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none}
+.chips a{flex:none;font-size:.8rem;color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px;white-space:nowrap}
+.chips a:hover,.chips a:focus-visible{border-color:var(--accent);outline:none}
+.chips a.complete{color:var(--done)}
+.group-label{font-size:.72rem;letter-spacing:.12em;color:var(--accent);font-weight:600;margin:36px 0 4px}
+section{margin-top:22px;scroll-margin-top:110px}
+section h2{font-family:var(--display);font-size:1.25rem;margin:0;display:flex;align-items:baseline;gap:10px}
+section h2 .cnt{font-family:var(--body);font-size:.78rem;color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums}
+section .lead{color:var(--muted);font-size:.86rem;margin:2px 0 8px}
+ul{list-style:none;margin:8px 0 0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+li+li{border-top:1px solid var(--line)}
+label{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;cursor:pointer}
+input[type=checkbox]{appearance:none;flex:none;width:20px;height:20px;margin-top:2px;border:1.5px solid var(--muted);border-radius:5px;display:grid;place-content:center;cursor:pointer;background:var(--surface)}
+input[type=checkbox]::after{content:"";width:10px;height:6px;border-left:2px solid var(--surface);border-bottom:2px solid var(--surface);transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+input[type=checkbox]:checked::after{opacity:1}
+input[type=checkbox]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.txt{min-width:0}
+.t{display:block}
+.n{display:block;color:var(--muted);font-size:.83rem;margin-top:1px}
+.who{display:inline-block;font-size:.7rem;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:2px;white-space:nowrap}
+li.on .t{color:var(--done);text-decoration:line-through}
+li.on .n,li.on .who{opacity:.55}
+.foot{margin-top:40px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:.85rem;color:var(--muted)}
+button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:7px 14px;cursor:pointer}
+button:hover,button:focus-visible{border-color:var(--accent);outline:none}
+button.danger{border-color:var(--accent);color:var(--accent)}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>본식 당일 체크리스트</h1>
+    <p>본식스냅 · 서브스냅 · DVD · 아이폰스냅 · 사회자 · 양가 축의대 기준. 체크한 항목은 이 기기에 저장돼요.</p>
+  </header>
+  <div class="bar">
+    <div class="prog"><div class="track"><div class="fill" id="fill"></div></div><span id="ptxt">0 / 0</span></div>
+    <nav class="chips" id="chips" aria-label="섹션 바로가기"></nav>
+  </div>
+  <main id="list"></main>
+  <div class="foot">
+    <button type="button" id="openAll">체크 해제한 항목만 보기</button>
+    <button type="button" id="reset">전체 초기화</button>
+    <span id="confirm" hidden>정말 모두 해제할까요? <button type="button" class="danger" id="yes">초기화</button> <button type="button" id="no">취소</button></span>
+  </div>
+</div>
+
+<script>
+const DATA = [
+ {g:"전날까지", id:"d1", h:"D-1 최종 확인", lead:"전날 밤에 한 번에 끝내 두면 당일 아침이 훨씬 가벼워요.", items:[
+  ["모든 업체에 도착 시간·장소 최종 문자 확인","본식스냅, 서브스냅, DVD, 아이폰스냅, 사회자, 헤어메이크업, 웨딩홀"],
+  ["업체 담당자 연락처 한 장에 정리해서 가방순이·혼주에게 공유"],
+  ["확정 식순표 출력 5부 이상","사회자, 본식스냅, DVD, 신랑신부, 웨딩홀 진행 담당"],
+  ["원판 촬영 순서·명단 정리","신랑신부 → 양가 부모님 → 직계 → 친척 → 친구 순이 일반적"],
+  ["입장·축가·영상 음원 파일 웨딩홀에 전달 확인","USB 백업도 가방에"],
+  ["현금 봉투 미리 이름 써서 준비","아래 '사례비·현금 봉투' 섹션 참고"],
+  ["가방에 번호 붙이고 내용물 메모","가방별로 뭐가 들었는지 가방순이가 바로 찾을 수 있게"],
+  ["휴대폰·보조배터리·아이폰스냅용 기기 완충"],
+  ["일찍 자기, 아침 메뉴 미리 정해 두기"]]},
+
+ {g:"준비물", id:"ring", h:"반지 · 서약", items:[
+  ["결혼반지 2개 + 반지 케이스","케이스는 디테일컷용. 반지 담당자(사회자나 친구) 정해서 전달",'신랑'],
+  ["혼인서약서 2부"],
+  ["성혼선언문 1부","주례 없는 식이면 혼주나 사회자가 낭독"],
+  ["부모님 덕담·편지 원고","낭독하는 분께 미리 전달"],
+  ["축사·편지 원고 사본","당일 잊어버릴 때 대비해 1부 더"]]},
+
+ {g:"준비물", id:"invite", h:"청첩장", items:[
+  ["스냅 디테일컷용 청첩장 2~3장","봉투, 실링, 리본까지 세트로. 작가님께 전달",'신부'],
+  ["여분 청첩장 몇 장","갑자기 오는 하객용"],
+  ["모바일 청첩장 링크·약도 최종 확인","주차 안내 문구 포함"]]},
+
+ {g:"준비물", id:"photo", h:"포토테이블", items:[
+  ["액자 사진 5~7장 + 액자","크기 다르게 섞으면 배치가 쉬워요"],
+  ["액자 거치대·이젤·소품","꽃, 캔들, 이니셜 오브제 등"],
+  ["웰컴보드 또는 배너"],
+  ["방명록 + 펜 2~3자루"],
+  ["포토테이블 세팅 담당자 지정","예식 후 회수 담당도 함께"]]},
+
+ {g:"준비물", id:"bride", h:"본식 드레스 (신부)", items:[
+  ["드레스 이모님(헬퍼) 시간·장소 재확인"],
+  ["웨딩 구두","미리 길들여 두고, 굽 높이는 드레스 길이와 맞춰 확인"],
+  ["누브라·속옷·속치마(필요 시)"],
+  ["귀걸이·목걸이·헤어 액세서리·베일"],
+  ["부케 수령 시간 확인","부케 받을 친구도 미리 정하기"],
+  ["립스틱·파우더 등 수정 화장품","메이크업샵에 립 색 미리 받아 두기"],
+  ["샵 이동 시 앞 단추 옷, 편한 신발"],
+  ["당일 아침 제모 한 번 더 확인","팔, 겨드랑이, 등"]]},
+
+ {g:"준비물", id:"groom", h:"본식 양복 (신랑)", items:[
+  ["턱시도 픽업 또는 대여 시간 확인",null,'신랑'],
+  ["셔츠·바지·자켓·조끼","셔츠는 전날 다림질"],
+  ["보타이 또는 넥타이"],
+  ["커프스·서스펜더 또는 벨트"],
+  ["검정 정장 양말 (여분 1켤레)"],
+  ["구두","광 내 두기"],
+  ["부토니에 수령 확인"],
+  ["헤어 왁스·빗·데오드란트·보풀제거기"]]},
+
+ {g:"준비물", id:"second", h:"2부 드레스 · 2부 의상", lead:"2부는 갈아입는 시간이 짧아서 미리 세팅이 핵심이에요.", items:[
+  ["2부 드레스(원피스) + 맞는 구두",null,'신부'],
+  ["2부용 속옷 (오프숄더라면 누브라)"],
+  ["2부 헤어 장식·귀걸이","헤어 변경 있으면 헬퍼에게 미리 요청"],
+  ["갈아입을 장소·시간 웨딩홀과 확인"],
+  ["2부 신랑 의상","셔츠, 넥타이 또는 넥클리스, 구두",'신랑'],
+  ["본식 드레스 반납 동선 확인","헬퍼 이모님이 회수하는지, 직접 반납인지"],
+  ["2부 의상 입은 사진 많이 찍어 달라고 아이폰스냅·친구에게 부탁"]]},
+
+ {g:"준비물", id:"hanbok", h:"부모님 한복 · 혼주", items:[
+  ["한복 대여 픽업 날짜 또는 당일 배송 확인",null,'혼주'],
+  ["속치마·속바지·버선·꽃신"],
+  ["노리개·머리 장식(뒷꽂이)"],
+  ["혼주 헤어메이크업 시간·장소 확인","신부 샵 시간과 겹치지 않게"],
+  ["혼주 코사지 수령","아버님들 양복 + 코사지"],
+  ["아버님 양복·넥타이·구두 확인"],
+  ["한복 반납 날짜·방법 확인"],
+  ["폐백 있으면 폐백 음식·폐백실 시간 확인"]]},
+
+ {g:"업체", id:"snap", h:"본식스냅", items:[
+  ["작가님 도착 시간·장소 (신부대기실) 확인"],
+  ["식순표·원판 명단 전달"],
+  ["디테일컷 소품 전달","청첩장, 반지 케이스, 향수, 구두"],
+  ["꼭 찍고 싶은 장면 리스트 공유","부모님과의 순간, 특정 지인 등"],
+  ["원판 촬영 시 부를 사람 담당 지정","친척 이름 아는 사람이 불러 주면 빨라요"],
+  ["잔금·추가금 결제 방식 확인"]]},
+
+ {g:"업체", id:"sub", h:"서브스냅", items:[
+  ["메인 작가와 동선·역할 분담 확인","하객석 리액션, 부모님 표정 위주 요청"],
+  ["대기실·입장 전 장면 촬영 범위 확인"],
+  ["식순표 전달"]]},
+
+ {g:"업체", id:"dvd", h:"DVD (본식 영상)", items:[
+  ["도착 시간 확인 + 식순표 전달"],
+  ["입장곡·축가·영상 음원 정보 공유"],
+  ["편지 낭독·축사 등 꼭 담을 장면 공유"],
+  ["하객 인터뷰 진행 여부 확인","한다면 인터뷰할 지인 미리 섭외"],
+  ["마이크 위치·음향은 웨딩홀과 조율됐는지 확인"]]},
+
+ {g:"업체", id:"iphone", h:"아이폰스냅", items:[
+  ["업체 또는 지인 작가 도착 시간 확인"],
+  ["원하는 컷 리스트·레퍼런스 공유","세로 영상, 입장 뒷모습, 2부 드레스 등"],
+  ["기기 충전 + 보조배터리 + 저장 공간 확인"],
+  ["원본 전달 방법 정하기","에어드롭, 구글드라이브 등"]]},
+
+ {g:"업체", id:"mc", h:"사회자", items:[
+  ["최종 사회자 시나리오 1부 전달"],
+  ["양가 부모님·신랑신부 이름 발음 확인"],
+  ["예식 1시간 전 도착 → 웨딩홀 진행팀과 미팅 요청"],
+  ["축가·축사자 이름과 순서 공유"],
+  ["피하고 싶은 멘트·이벤트 미리 전달"],
+  ["사례비 봉투 준비 + 전달 담당 지정"]]},
+
+ {g:"사람 · 비용", id:"gift", h:"축의대 (양가)", lead:"양가 각각 2명 이상, 믿을 수 있는 분으로.", items:[
+  ["신랑측 축의대 담당자 확정",null,'신랑측'],
+  ["신부측 축의대 담당자 확정",null,'신부측'],
+  ["식권 수량 웨딩홀에서 수령·양가 나누기"],
+  ["방명록·펜·축의금 봉투 여분"],
+  ["축의금 보관 가방 (지퍼·잠금 되는 것)"],
+  ["축의대 안내 메모 전달","식권 지급 기준, 축의금 장부 작성법, 모르는 사람 응대"],
+  ["답례품 있으면 위치·수량 확인"],
+  ["예식 후 축의금 전달받을 사람 지정","양가 혼주 또는 신랑신부에게 직접"]]},
+
+ {g:"사람 · 비용", id:"cash", h:"사례비 · 현금 봉투", lead:"봉투마다 받는 분 이름을 써 두면 헷갈리지 않아요.", items:[
+  ["헬퍼(드레스 이모님) 수고비"],
+  ["사회자 사례비"],
+  ["축가 사례비"],
+  ["축의대 담당자 감사 봉투 (양가)"],
+  ["가방순이 감사 봉투"],
+  ["업체 잔금 (현금 결제인 곳)"],
+  ["주차권·비상 현금"]]},
+
+ {g:"사람 · 비용", id:"helper", h:"가방순이 · 도우미", items:[
+  ["가방순이에게 가방 목록·연락처표 전달"],
+  ["신부 휴대폰 맡기기 (잠금 해제 방법 공유)"],
+  ["드레스 뒷자락·표정 체크 부탁"],
+  ["2부 의상·폐백 때 동행 부탁"]]},
+
+ {g:"사람 · 비용", id:"kit", h:"비상 키트", items:[
+  ["안전핀·옷핀·바늘과 실","드레스 응급 수선"],
+  ["양면테이프·밴드·반창고"],
+  ["진통제·소화제·인공눈물"],
+  ["물티슈·티슈·면봉·화장솜"],
+  ["빨대 달린 생수·초콜릿 같은 간식","신부는 대기실에서 거의 못 먹어요"],
+  ["손거울·빗·실핀·헤어스프레이"],
+  ["가글·껌"],
+  ["작은 우산 (비 예보 시)"]]},
+
+ {g:"마무리", id:"after", h:"예식 후", items:[
+  ["축의금 회수 + 장부 확인 (양가 모두)"],
+  ["포토테이블 액자·소품 회수"],
+  ["반지 케이스·청첩장 등 디테일 소품 회수"],
+  ["부케 전달 / 꽃 정리"],
+  ["드레스·턱시도·한복 반납"],
+  ["대기실·폐백실 두고 간 물건 확인"],
+  ["업체 원본 전달 일정 메모","스냅 셀렉, DVD 수령 시기"]]}
+];
+
+let state={};
+try{state=JSON.parse(localStorage.getItem("wd-check")||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem("wd-check",JSON.stringify(state))}catch(e){}};
+const list=document.getElementById("list"), chips=document.getElementById("chips");
+let onlyOpen=false, lastGroup=null;
+
+DATA.forEach(sec=>{
+  if(sec.g!==lastGroup){const d=document.createElement("div");d.className="group-label";d.textContent=sec.g;list.appendChild(d);lastGroup=sec.g}
+  const s=document.createElement("section");s.id=sec.id;
+  s.innerHTML=`<h2>${sec.h}<span class="cnt"></span></h2>${sec.lead?`<p class="lead">${sec.lead}</p>`:""}`;
+  const ul=document.createElement("ul");
+  sec.items.forEach((it,i)=>{
+    const key=sec.id+"-"+i, li=document.createElement("li");
+    li.innerHTML=`<label for="${key}"><input type="checkbox" id="${key}"><span class="txt"><span class="t">${it[0]}${it[2]?`<span class="who">${it[2]}</span>`:""}</span>${it[1]?`<span class="n">${it[1]}</span>`:""}</span></label>`;
+    const cb=li.querySelector("input");cb.checked=!!state[key];li.classList.toggle("on",cb.checked);
+    cb.addEventListener("change",()=>{state[key]=cb.checked;li.classList.toggle("on",cb.checked);save();update()});
+    ul.appendChild(li);
+  });
+  s.appendChild(ul);list.appendChild(s);
+  const a=document.createElement("a");a.href="#"+sec.id;a.textContent=sec.h;a.dataset.id=sec.id;chips.appendChild(a);
+});
+
+function update(){
+  let tot=0,done=0;
+  DATA.forEach(sec=>{
+    const s=document.getElementById(sec.id), boxes=[...s.querySelectorAll("input")];
+    const d=boxes.filter(b=>b.checked).length;tot+=boxes.length;done+=d;
+    s.querySelector(".cnt").textContent=`${d}/${boxes.length}`;
+    chips.querySelector(`[data-id="${sec.id}"]`).classList.toggle("complete",d===boxes.length);
+    s.querySelectorAll("li").forEach(li=>li.hidden=onlyOpen&&li.classList.contains("on"));
+    s.hidden=onlyOpen&&d===boxes.length;
+  });
+  document.getElementById("fill").style.width=(tot?done/tot*100:0)+"%";
+  document.getElementById("ptxt").textContent=`${done} / ${tot}`;
+}
+update();
+
+const openBtn=document.getElementById("openAll");
+openBtn.onclick=()=>{onlyOpen=!onlyOpen;openBtn.textContent=onlyOpen?"전체 항목 보기":"체크 해제한 항목만 보기";update()};
+const conf=document.getElementById("confirm");
+document.getElementById("reset").onclick=()=>conf.hidden=false;
+document.getElementById("no").onclick=()=>conf.hidden=true;
+document.getElementById("yes").onclick=()=>{state={};save();document.querySelectorAll("#list input").forEach(b=>{b.checked=false;b.closest("li").classList.remove("on")});conf.hidden=true;update()};
+</script>
+</body>
+</html>
