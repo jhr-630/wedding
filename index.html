@@ -402,7 +402,10 @@ document.getElementById("tabs").addEventListener("keydown",e=>{
   const n=cur==="pre"?"day":"pre";setTab(n);document.querySelector(`.tab[data-tab="${n}"]`).focus();
 });
 const h=location.hash.replace("#","");
-if(h==="pre"||h==="day")cur=h;else{try{const s=localStorage.getItem("wd-tab");if(s==="pre"||s==="day")cur=s}catch(e){}}
+const SWITCH=new Date(2026,11,5);// 12월 5일 0시(기기 시간) 이후로는 열 때 본식 당일 탭부터
+if(h==="pre"||h==="day")cur=h;
+else if(new Date()>=SWITCH)cur="day";
+else{try{const s=localStorage.getItem("wd-tab");if(s==="pre"||s==="day")cur=s}catch(e){}}
 render();
 
 const openBtn=document.getElementById("openAll");
