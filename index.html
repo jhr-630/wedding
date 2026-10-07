@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>본식 당일 체크리스트</title>
+<title>결혼식 체크리스트</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
@@ -57,6 +57,12 @@ li.on .n,li.on .who{opacity:.55}
 button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:7px 14px;cursor:pointer}
 button:hover,button:focus-visible{border-color:var(--accent);outline:none}
 button.danger{border-color:var(--accent);color:var(--accent)}
+.tabs{display:inline-flex;gap:4px;margin-top:14px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.tab{border:0;background:transparent;border-radius:7px;padding:7px 18px;font-size:.92rem;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--surface);font-weight:600}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header p#lead{margin-top:10px}
+.group-label[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){.fill{transition:none}}
 </style>
 </head>
@@ -64,23 +70,94 @@ button.danger{border-color:var(--accent);color:var(--accent)}
 
 <div class="wrap">
   <header>
-    <h1>본식 당일 체크리스트</h1>
-    <p>본식스냅 · 서브스냅 · DVD · 아이폰스냅 · 사회자 · 양가 축의대 기준. 체크한 항목은 이 기기에 저장돼요.</p>
+    <h1>결혼식 체크리스트</h1>
+    <div class="tabs" id="tabs" role="tablist" aria-label="체크리스트 선택">
+      <button type="button" class="tab" role="tab" data-tab="pre" id="tab-pre">본식 전</button>
+      <button type="button" class="tab" role="tab" data-tab="day" id="tab-day">본식 당일</button>
+    </div>
+    <p id="lead"></p>
   </header>
   <div class="bar">
     <div class="prog"><div class="track"><div class="fill" id="fill"></div></div><span id="ptxt">0 / 0</span></div>
     <nav class="chips" id="chips" aria-label="섹션 바로가기"></nav>
   </div>
-  <main id="list"></main>
+  <main id="list" role="tabpanel"></main>
   <div class="foot">
     <button type="button" id="openAll">체크 해제한 항목만 보기</button>
-    <button type="button" id="reset">전체 초기화</button>
-    <span id="confirm" hidden>정말 모두 해제할까요? <button type="button" class="danger" id="yes">초기화</button> <button type="button" id="no">취소</button></span>
+    <button type="button" id="reset">이 탭 초기화</button>
+    <span id="confirm" hidden>이 탭의 체크를 처음 상태로 되돌릴까요? <button type="button" class="danger" id="yes">초기화</button> <button type="button" id="no">취소</button></span>
   </div>
 </div>
 
 <script>
-const DATA = [
+const PRE = [
+ {g:null, id:"p-doing", h:"진행 중", items:[
+  ["본식 드레스","디자인·구두 선정 완료\n10월 주문 예정, 최종 구매 확정 필요",'신부'],
+  ["신랑 예복","10월쯤 맞출 예정",'신랑'],
+  ["혼주 한복 (양가 모두 한복)","10/9 · 10/10 일정"],
+  ["혼주·가족 메이크업 예약","데일리 메이크업, 총 3명\n영무 가족: 형님\n혜리 가족: 큰언니 2명 / 둘째 + 셋째 3명 (식장에서 진행)"],
+  ["포토테이블","네임펜만 구매하면 끝 (5개)\n다이소 액자 + 거울 + 미니 등신대 + 사진 + 큰 액자(방명록)"],
+  ["식전영상","자체 제작"],
+  ["신혼여행 준비","투어, eSIM, 보험, 옷 준비만 남음"],
+  ["하객 리스트","11월 초 양가 전체 정리 예정"],
+  ["시식","11월 21일 11시"],
+  ["리허설","본식 전날 진행 + 한복 픽업"]]},
+
+ {g:null, id:"p-before", h:"본식 직전", items:[
+  ["업체별 예약 내용 최종 확인"],
+  ["BGM·식전영상 파일 최종 테스트","본식날 카카오톡에 데이터 저장 + USB 준비"],
+  ["전체 식순과 타임테이블 공유"],
+  ["신랑·신부·혼주·담당자 연락망 작성"],
+  ["당일 준비물 한곳에 포장","정리 후 겉에 매직으로 내용물 적기"],
+  ["결혼식 당일 날씨 확인","우천 여부만 확인"],
+  ["신랑·신부 식사·간식 준비","아침은 죽 또는 샐러드, 식장에서는 사탕 정도"]]},
+
+ {g:"미정 항목", id:"p-attire", h:"드레스 · 의상", items:[
+  ["베일 / 장갑 / 헤어장식",null,'신부'],
+  ["신랑 셔츠 / 구두 / 벨트 / 넥타이 또는 보타이",null,'신랑'],
+  ["혼주 구두 / 가방 / 액세서리",null,'혼주']]},
+
+ {g:"미정 항목", id:"p-guest", h:"청첩장 · 하객 관리", items:[
+  ["회사 / 친구 / 친척 전달 일정 정리"],
+  ["예상 참석 인원·식권 수량 산정"]]},
+
+ {g:"미정 항목", id:"p-cere", h:"본식 진행", items:[
+  ["양가 부모님 입장곡 선택"],
+  ["감사 인사 멘트 준비"],
+  ["사회자 대본 전달"],
+  ["본식 BGM 리스트 정리"],
+  ["스냅·DVD 요청 컷 정리","본식 스냅: 신부입장 뒷모습\n서브 스냅: 신부입장 앞모습\nDVD: 신부입장 뒷모습"],
+  ["당일 타임테이블 정리"],
+  ["아이폰스냅 요청 전달","부모님 입장 영상·사진 촬영 필수"]]},
+
+ {g:"미정 항목", id:"p-family", h:"가족 · 양가", items:[
+  ["혼주 메이크업 시작 시간 확인"],
+  ["본식 당일 가족 집합 시간 공유"],
+  ["본식 전 시식 일정 확인"]]},
+
+ {g:"미정 항목", id:"p-trip", h:"신혼여행", items:[
+  ["eSIM · 여행자보험 가입"],
+  ["항공권 이름 철자 확인"],
+  ["숙소 바우처 확인"],
+  ["환전 · 카드 준비","29만 엔 환전 완료, 카드 준비만 남음"],
+  ["공항 이동 방법","자차 이용, 주차장 예약 필요"],
+  ["캐리어 3개 준비","기존 2개 + 새로 산 1개 (아직 배송 전)"]]},
+
+ {g:null, id:"p-done", h:"완료된 항목", done:true, items:[
+  ["상견례","7월 3일"],
+  ["청첩장·모바일청첩장 제작, 식권 출력, 부자재 구매","조립은 8/15 연휴에 진행"],
+  ["사회자 섭외"],
+  ["축가 섭외","은빈 + 명현 / 영재 + 민종"],
+  ["입장곡 확정","영무: 작전명 청춘 / 혜리: 가호 시작"],
+  ["2부 옷 컨셉 확정","신부: 흰 드레스 + 흰 양말\n신랑: 예복 바지 + 흰색 또는 베이지 자켓"],
+  ["신부 본식 헤어메이크업 예약"],
+  ["혼주 헤어메이크업 예약"],
+  ["혼주 액세서리 구매","귀걸이, 헤어 액세서리, 넥타이"],
+  ["드레스 헬퍼 예약","숨고, 6/8"],
+  ["축의대 업체 예약","데이피스, 7/7"],
+  ["가방순이 지정","명현, 은빈"]]}
+];
+const DAY = [
  {g:"전날까지", id:"d1", h:"D-1 최종 확인", lead:"전날 밤에 한 번에 끝내 두면 당일 아침이 훨씬 가벼워요.", items:[
   ["모든 업체에 도착 시간·장소 최종 문자 확인","본식스냅, 서브스냅, DVD, 아이폰스냅, 사회자, 헤어메이크업, 웨딩홀"],
   ["업체 담당자 연락처 한 장에 정리해서 가방순이·혼주에게 공유"],
@@ -244,28 +321,42 @@ const DATA = [
 let state={};
 try{state=JSON.parse(localStorage.getItem("wd-check")||"{}")}catch(e){}
 const save=()=>{try{localStorage.setItem("wd-check",JSON.stringify(state))}catch(e){}};
+const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const TABS={
+  pre:{data:PRE,pref:"",lead:"진행 중 · 본식 직전 · 미정 · 완료 순서로 정리했어요. 체크한 항목은 이 기기에 저장돼요."},
+  day:{data:DAY,pref:"",lead:"본식스냅 · 서브스냅 · DVD · 아이폰스냅 · 사회자 · 양가 축의대 기준. 체크한 항목은 이 기기에 저장돼요."}
+};
 const list=document.getElementById("list"), chips=document.getElementById("chips");
-let onlyOpen=false, lastGroup=null;
+let onlyOpen=false, cur="pre";
+const isOn=(key,sec)=>key in state?!!state[key]:!!sec.done;
 
-DATA.forEach(sec=>{
-  if(sec.g!==lastGroup){const d=document.createElement("div");d.className="group-label";d.textContent=sec.g;list.appendChild(d);lastGroup=sec.g}
-  const s=document.createElement("section");s.id=sec.id;
-  s.innerHTML=`<h2>${sec.h}<span class="cnt"></span></h2>${sec.lead?`<p class="lead">${sec.lead}</p>`:""}`;
-  const ul=document.createElement("ul");
-  sec.items.forEach((it,i)=>{
-    const key=sec.id+"-"+i, li=document.createElement("li");
-    li.innerHTML=`<label for="${key}"><input type="checkbox" id="${key}"><span class="txt"><span class="t">${it[0]}${it[2]?`<span class="who">${it[2]}</span>`:""}</span>${it[1]?`<span class="n">${it[1]}</span>`:""}</span></label>`;
-    const cb=li.querySelector("input");cb.checked=!!state[key];li.classList.toggle("on",cb.checked);
-    cb.addEventListener("change",()=>{state[key]=cb.checked;li.classList.toggle("on",cb.checked);save();update()});
-    ul.appendChild(li);
+function render(){
+  list.innerHTML="";chips.innerHTML="";let lastGroup=null;
+  TABS[cur].data.forEach(sec=>{
+    if(!sec.g){lastGroup=null}else if(sec.g!==lastGroup){const d=document.createElement("div");d.className="group-label";d.textContent=sec.g;list.appendChild(d);lastGroup=sec.g}
+    const s=document.createElement("section");s.id=sec.id;
+    s.innerHTML=`<h2>${sec.h}<span class="cnt"></span></h2>${sec.lead?`<p class="lead">${sec.lead}</p>`:""}`;
+    const ul=document.createElement("ul");
+    sec.items.forEach((it,i)=>{
+      const key=sec.id+"-"+i, li=document.createElement("li");
+      const note=it[1]?it[1].split("\n").map(l=>`<span class="n">${esc(l)}</span>`).join(""):"";
+      li.innerHTML=`<label for="${key}"><input type="checkbox" id="${key}"><span class="txt"><span class="t">${esc(it[0])}${it[2]?`<span class="who">${it[2]}</span>`:""}</span>${note}</span></label>`;
+      const cb=li.querySelector("input");cb.checked=isOn(key,sec);li.classList.toggle("on",cb.checked);
+      cb.addEventListener("change",()=>{state[key]=cb.checked;li.classList.toggle("on",cb.checked);save();update()});
+      ul.appendChild(li);
+    });
+    s.appendChild(ul);list.appendChild(s);
+    const a=document.createElement("a");a.href="#"+sec.id;a.textContent=sec.h;a.dataset.id=sec.id;
+    a.addEventListener("click",e=>{e.preventDefault();s.scrollIntoView({behavior:"smooth"})});
+    chips.appendChild(a);
   });
-  s.appendChild(ul);list.appendChild(s);
-  const a=document.createElement("a");a.href="#"+sec.id;a.textContent=sec.h;a.dataset.id=sec.id;chips.appendChild(a);
-});
-
+  document.getElementById("lead").textContent=TABS[cur].lead;
+  document.querySelectorAll(".tab").forEach(t=>{const on=t.dataset.tab===cur;t.setAttribute("aria-selected",on);t.tabIndex=on?0:-1});
+  update();
+}
 function update(){
   let tot=0,done=0;
-  DATA.forEach(sec=>{
+  TABS[cur].data.forEach(sec=>{
     const s=document.getElementById(sec.id), boxes=[...s.querySelectorAll("input")];
     const d=boxes.filter(b=>b.checked).length;tot+=boxes.length;done+=d;
     s.querySelector(".cnt").textContent=`${d}/${boxes.length}`;
@@ -273,17 +364,32 @@ function update(){
     s.querySelectorAll("li").forEach(li=>li.hidden=onlyOpen&&li.classList.contains("on"));
     s.hidden=onlyOpen&&d===boxes.length;
   });
+  document.querySelectorAll(".group-label").forEach(g=>{
+    let n=g.nextElementSibling,any=false;while(n&&n.tagName==="SECTION"){if(!n.hidden)any=true;n=n.nextElementSibling}
+    g.hidden=!any;
+  });
   document.getElementById("fill").style.width=(tot?done/tot*100:0)+"%";
   document.getElementById("ptxt").textContent=`${done} / ${tot}`;
 }
-update();
+function setTab(t){cur=t;try{localStorage.setItem("wd-tab",t)}catch(e){}render();window.scrollTo(0,0)}
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>setTab(t.dataset.tab)));
+document.getElementById("tabs").addEventListener("keydown",e=>{
+  if(e.key!=="ArrowLeft"&&e.key!=="ArrowRight")return;
+  const n=cur==="pre"?"day":"pre";setTab(n);document.querySelector(`.tab[data-tab="${n}"]`).focus();
+});
+const h=location.hash.replace("#","");
+if(h==="pre"||h==="day")cur=h;else{try{const s=localStorage.getItem("wd-tab");if(s==="pre"||s==="day")cur=s}catch(e){}}
+render();
 
 const openBtn=document.getElementById("openAll");
 openBtn.onclick=()=>{onlyOpen=!onlyOpen;openBtn.textContent=onlyOpen?"전체 항목 보기":"체크 해제한 항목만 보기";update()};
 const conf=document.getElementById("confirm");
 document.getElementById("reset").onclick=()=>conf.hidden=false;
 document.getElementById("no").onclick=()=>conf.hidden=true;
-document.getElementById("yes").onclick=()=>{state={};save();document.querySelectorAll("#list input").forEach(b=>{b.checked=false;b.closest("li").classList.remove("on")});conf.hidden=true;update()};
+document.getElementById("yes").onclick=()=>{
+  TABS[cur].data.forEach(sec=>sec.items.forEach((_,i)=>{delete state[sec.id+"-"+i]}));
+  save();conf.hidden=true;render();
+};
 </script>
 </body>
 </html>
