@@ -62,6 +62,9 @@ button.danger{border-color:var(--accent);color:var(--accent)}
 .tab[aria-selected="true"]{background:var(--accent);color:var(--surface);font-weight:600}
 .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 header p#lead{margin-top:10px}
+.from{display:inline-block;font-size:.7rem;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:2px;white-space:nowrap}
+li.leaving{opacity:.4;transition:opacity .3s}
+.empty{margin:8px 0 0;padding:12px 14px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);font-size:.86rem}
 .group-label[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){.fill{transition:none}}
 </style>
@@ -323,29 +326,42 @@ try{state=JSON.parse(localStorage.getItem("wd-check")||"{}")}catch(e){}
 const save=()=>{try{localStorage.setItem("wd-check",JSON.stringify(state))}catch(e){}};
 const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const TABS={
-  pre:{data:PRE,pref:"",lead:"진행 중 · 본식 직전 · 미정 · 완료 순서로 정리했어요. 체크한 항목은 이 기기에 저장돼요."},
+  pre:{data:PRE,pref:"",lead:"체크하면 맨 아래 ‘완료된 항목’으로 옮겨지고, 체크를 풀면 원래 자리로 돌아가요. 체크한 항목은 이 기기에 저장돼요."},
   day:{data:DAY,pref:"",lead:"본식스냅 · 서브스냅 · DVD · 아이폰스냅 · 사회자 · 양가 축의대 기준. 체크한 항목은 이 기기에 저장돼요."}
 };
 const list=document.getElementById("list"), chips=document.getElementById("chips");
 let onlyOpen=false, cur="pre";
 const isOn=(key,sec)=>key in state?!!state[key]:!!sec.done;
 
+function itemLi(it,key,sec,from){
+  const li=document.createElement("li");
+  const note=it[1]?it[1].split("\n").map(l=>`<span class="n">${esc(l)}</span>`).join(""):"";
+  li.innerHTML=`<label for="${key}"><input type="checkbox" id="${key}"><span class="txt"><span class="t">${esc(it[0])}${it[2]?`<span class="who">${it[2]}</span>`:""}${from?`<span class="from">${from}</span>`:""}</span>${note}</span></label>`;
+  const cb=li.querySelector("input");cb.checked=isOn(key,sec);li.classList.toggle("on",cb.checked);
+  cb.addEventListener("change",()=>{
+    state[key]=cb.checked;li.classList.toggle("on",cb.checked);save();
+    if(moves()){li.classList.add("leaving");setTimeout(()=>{const y=window.scrollY;render();window.scrollTo(0,y)},350)}else update();
+  });
+  return li;
+}
+const moves=()=>TABS[cur].data.some(s=>s.done);
 function render(){
   list.innerHTML="";chips.innerHTML="";let lastGroup=null;
-  TABS[cur].data.forEach(sec=>{
+  const data=TABS[cur].data, mv=moves(), moved=[];
+  if(mv)data.forEach(sec=>{if(!sec.done)sec.items.forEach((it,i)=>{const key=sec.id+"-"+i;if(isOn(key,sec))moved.push([it,key,sec])})});
+  data.forEach(sec=>{
     if(!sec.g){lastGroup=null}else if(sec.g!==lastGroup){const d=document.createElement("div");d.className="group-label";d.textContent=sec.g;list.appendChild(d);lastGroup=sec.g}
     const s=document.createElement("section");s.id=sec.id;
     s.innerHTML=`<h2>${sec.h}<span class="cnt"></span></h2>${sec.lead?`<p class="lead">${sec.lead}</p>`:""}`;
     const ul=document.createElement("ul");
+    if(mv&&sec.done)moved.forEach(([it,key,src])=>ul.appendChild(itemLi(it,key,src,src.h)));
     sec.items.forEach((it,i)=>{
-      const key=sec.id+"-"+i, li=document.createElement("li");
-      const note=it[1]?it[1].split("\n").map(l=>`<span class="n">${esc(l)}</span>`).join(""):"";
-      li.innerHTML=`<label for="${key}"><input type="checkbox" id="${key}"><span class="txt"><span class="t">${esc(it[0])}${it[2]?`<span class="who">${it[2]}</span>`:""}</span>${note}</span></label>`;
-      const cb=li.querySelector("input");cb.checked=isOn(key,sec);li.classList.toggle("on",cb.checked);
-      cb.addEventListener("change",()=>{state[key]=cb.checked;li.classList.toggle("on",cb.checked);save();update()});
-      ul.appendChild(li);
+      const key=sec.id+"-"+i;
+      if(mv&&!sec.done&&isOn(key,sec))return;
+      ul.appendChild(itemLi(it,key,sec,null));
     });
-    s.appendChild(ul);list.appendChild(s);
+    if(!ul.children.length){const e=document.createElement("p");e.className="empty";e.textContent="모두 완료했어요. 체크한 항목은 ‘완료된 항목’에 있어요.";s.appendChild(e)}else s.appendChild(ul);
+    list.appendChild(s);
     const a=document.createElement("a");a.href="#"+sec.id;a.textContent=sec.h;a.dataset.id=sec.id;
     a.addEventListener("click",e=>{e.preventDefault();s.scrollIntoView({behavior:"smooth"})});
     chips.appendChild(a);
@@ -355,15 +371,23 @@ function render(){
   update();
 }
 function update(){
-  let tot=0,done=0;
+  let tot=0,done=0;const mv=moves();
   TABS[cur].data.forEach(sec=>{
     const s=document.getElementById(sec.id), boxes=[...s.querySelectorAll("input")];
-    const d=boxes.filter(b=>b.checked).length;tot+=boxes.length;done+=d;
-    s.querySelector(".cnt").textContent=`${d}/${boxes.length}`;
-    chips.querySelector(`[data-id="${sec.id}"]`).classList.toggle("complete",d===boxes.length);
+    const d=boxes.filter(b=>b.checked).length;
+    const cnt=s.querySelector(".cnt"), chip=chips.querySelector(`[data-id="${sec.id}"]`);
+    if(mv){
+      const left=boxes.length-d;
+      cnt.textContent=sec.done?`${d}개`:(left?`${left}개 남음`:"완료");
+      chip.classList.toggle("complete",!sec.done&&left===0);
+    }else{
+      cnt.textContent=`${d}/${boxes.length}`;
+      chip.classList.toggle("complete",d===boxes.length);
+    }
     s.querySelectorAll("li").forEach(li=>li.hidden=onlyOpen&&li.classList.contains("on"));
-    s.hidden=onlyOpen&&d===boxes.length;
+    s.hidden=onlyOpen&&boxes.length-d===0;
   });
+  TABS[cur].data.forEach(sec=>sec.items.forEach((_,i)=>{tot++;if(isOn(sec.id+"-"+i,sec))done++}));
   document.querySelectorAll(".group-label").forEach(g=>{
     let n=g.nextElementSibling,any=false;while(n&&n.tagName==="SECTION"){if(!n.hidden)any=true;n=n.nextElementSibling}
     g.hidden=!any;
