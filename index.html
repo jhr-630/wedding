@@ -12,15 +12,16 @@
 :root{
   --bg:#f5f6f8; --surface:#ffffff; --ink:#1d2433; --muted:#667085; --line:#e3e6ec;
   --accent:#a8566a; --accent-soft:#f6e8ec; --done:#9aa3b2;
+  --bride:#7a4bb5; --bride-soft:#efe7f9; --groom:#2f62b8; --groom-soft:#e4edfb;
   --display:"Gowun Batang", "Nanum Myeongjo", serif;
   --body:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#14171e; --surface:#1c2029; --ink:#e8eaf0; --muted:#9aa2b3; --line:#2b313d;
-  --accent:#e49aae; --accent-soft:#3a2730; --done:#6b7385; color-scheme:dark}}
+  --accent:#e49aae; --accent-soft:#3a2730; --done:#6b7385; --bride:#c4a3f0; --bride-soft:#30264a; --groom:#93b6f2; --groom-soft:#1f2c47; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#14171e; --surface:#1c2029; --ink:#e8eaf0; --muted:#9aa2b3; --line:#2b313d;
-  --accent:#e49aae; --accent-soft:#3a2730; --done:#6b7385; color-scheme:dark}
+  --accent:#e49aae; --accent-soft:#3a2730; --done:#6b7385; --bride:#c4a3f0; --bride-soft:#30264a; --groom:#93b6f2; --groom-soft:#1f2c47; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;margin:0}
 .wrap{max-width:720px;margin:0 auto;padding:32px 16px 80px}
@@ -62,6 +63,8 @@ button.danger{border-color:var(--accent);color:var(--accent)}
 .tab[aria-selected="true"]{background:var(--accent);color:var(--surface);font-weight:600}
 .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 header p#lead{margin-top:10px}
+.who.bride{color:var(--bride);background:var(--bride-soft)}
+.who.groom{color:var(--groom);background:var(--groom-soft)}
 .from{display:inline-block;font-size:.7rem;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:2px;white-space:nowrap}
 li.leaving{opacity:.4;transition:opacity .3s}
 .empty{margin:8px 0 0;padding:12px 14px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);font-size:.86rem}
@@ -94,51 +97,57 @@ li.leaving{opacity:.4;transition:opacity .3s}
 
 <script>
 const PRE = [
- {g:null, id:"p-doing", h:"진행 중", items:[
-  ["본식 드레스","디자인·구두 선정 완료\n10월 주문 예정, 최종 구매 확정 필요",'신부'],
+ {id:"p-attire", h:"드레스 · 의상", stable:true, items:[
+  ["본식 드레스","디자인 선정 완료\n11월 구매 예정 (최종 구매 확정 필요)",'신부'],
+  ["본식 드레스 구두 구매","디자인 선정 완료",'신부'],
+  ["베일",null,'신부'],
+  ["장갑",null,'신부'],
+  ["헤어장식",null,'신부'],
   ["신랑 예복","10월쯤 맞출 예정",'신랑'],
-  ["혼주 한복 (양가 모두 한복)","10/9 · 10/10 일정"],
-  ["혼주·가족 메이크업 예약","데일리 메이크업, 총 3명\n영무 가족: 형님\n혜리 가족: 큰언니 2명 / 둘째 + 셋째 3명 (식장에서 진행)"],
-  ["포토테이블","네임펜만 구매하면 끝 (5개)\n다이소 액자 + 거울 + 미니 등신대 + 사진 + 큰 액자(방명록)"],
-  ["식전영상","자체 제작"],
-  ["신혼여행 준비","투어, eSIM, 보험, 옷 준비만 남음"],
-  ["하객 리스트","11월 초 양가 전체 정리 예정"],
-  ["시식","11월 21일 11시"],
-  ["리허설","본식 전날 진행 + 한복 픽업"]]},
+  ["본식 신랑 구두",null,'신랑'],
+  ["신랑 셔츠",null,'신랑'],
+  ["신랑 벨트",null,'신랑'],
+  ["신랑 넥타이",null,'신랑'],
+  ["혼주 한복 (양가 모두 한복)","10/9 · 10/10 일정",'혼주'],
+  ["신부측 아버님 한복 제작","11월 초 제작 예정",'혼주'],
+  ["혼주 구두",null,'혼주'],
+  ["혼주 가방",null,'혼주']]},
 
- {g:null, id:"p-before", h:"본식 직전", items:[
-  ["업체별 예약 내용 최종 확인"],
-  ["BGM·식전영상 파일 최종 테스트","본식날 카카오톡에 데이터 저장 + USB 준비"],
-  ["전체 식순과 타임테이블 공유"],
-  ["신랑·신부·혼주·담당자 연락망 작성"],
-  ["당일 준비물 한곳에 포장","정리 후 겉에 매직으로 내용물 적기"],
-  ["결혼식 당일 날씨 확인","우천 여부만 확인"],
-  ["신랑·신부 식사·간식 준비","아침은 죽 또는 샐러드, 식장에서는 사탕 정도"]]},
-
- {g:"미정 항목", id:"p-attire", h:"드레스 · 의상", items:[
-  ["베일 / 장갑 / 헤어장식",null,'신부'],
-  ["신랑 셔츠 / 구두 / 벨트 / 넥타이 또는 보타이",null,'신랑'],
-  ["혼주 구두 / 가방 / 액세서리",null,'혼주']]},
-
- {g:"미정 항목", id:"p-guest", h:"청첩장 · 하객 관리", items:[
-  ["회사 / 친구 / 친척 전달 일정 정리"],
+ {id:"p-guest", h:"청첩장 · 하객 관리", stable:true, items:[
+  ["회사 청첩장 전달 일정",null,'신랑측'],
+  ["친구 청첩장 전달 일정",null,'신랑측'],
+  ["친척 청첩장 전달 일정",null,'신랑측'],
+  ["회사 청첩장 전달 일정",null,'신부측'],
+  ["친구 청첩장 전달 일정",null,'신부측'],
+  ["친척 청첩장 전달 일정",null,'신부측'],
   ["예상 참석 인원·식권 수량 산정"]]},
 
- {g:"미정 항목", id:"p-cere", h:"본식 진행", items:[
+ {id:"p-cere", h:"본식 진행", stable:true, items:[
+  ["포토테이블","네임펜만 구매하면 끝 (5개)\n다이소 액자 + 거울 + 미니 등신대 + 사진 + 큰 액자(방명록)"],
+  ["식전영상","자체 제작"],
   ["양가 부모님 입장곡 선택"],
   ["감사 인사 멘트 준비"],
   ["사회자 대본 전달"],
   ["본식 BGM 리스트 정리"],
   ["스냅·DVD 요청 컷 정리","본식 스냅: 신부입장 뒷모습\n서브 스냅: 신부입장 앞모습\nDVD: 신부입장 뒷모습"],
-  ["당일 타임테이블 정리"],
   ["아이폰스냅 요청 전달","부모님 입장 영상·사진 촬영 필수"]]},
 
- {g:"미정 항목", id:"p-family", h:"가족 · 양가", items:[
-  ["혼주 메이크업 시작 시간 확인"],
-  ["본식 당일 가족 집합 시간 공유"],
-  ["본식 전 시식 일정 확인"]]},
+ {id:"p-family", h:"가족 · 양가", stable:true, items:[
+  ["혼주·가족 메이크업 예약","전부 식장에서 진행 예정\n혼주: 신랑 아버님 · 신랑 어머님 · 신부 아버님 · 신부 어머님\n혜리 가족: 큰언니 2명 / 작은언니 2명 / 오빠\n영무 가족: 형님"],
+  ["혼주 메이크업 시작 시간 확인 및 공유"],
+  ["시식","11월 21일 11시"]]},
 
- {g:"미정 항목", id:"p-trip", h:"신혼여행", items:[
+ {id:"p-before", h:"본식 직전", stable:true, items:[
+  ["리허설","본식 전날 진행 + 한복 픽업"],
+  ["업체별 예약 내용 최종 확인"],
+  ["BGM·식전영상 파일 최종 테스트","본식날 카카오톡에 데이터 저장 + USB 준비"],
+  ["전체 식순·당일 타임테이블 정리 및 공유"],
+  ["신랑·신부·혼주·담당자 연락망 작성"],
+  ["당일 준비물 한곳에 포장","정리 후 겉에 매직으로 내용물 적기"],
+  ["결혼식 당일 날씨 확인","우천 여부만 확인"],
+  ["신랑·신부 식사·간식 준비","아침은 죽 또는 샐러드, 식장에서는 사탕 정도"]]},
+
+ {id:"p-trip", h:"신혼여행", stable:true, items:[
   ["eSIM · 여행자보험 가입"],
   ["항공권 이름 철자 확인"],
   ["숙소 바우처 확인"],
@@ -146,7 +155,7 @@ const PRE = [
   ["공항 이동 방법","자차 이용, 주차장 예약 필요"],
   ["캐리어 3개 준비","기존 2개 + 새로 산 1개 (아직 배송 전)"]]},
 
- {g:null, id:"p-done", h:"완료된 항목", done:true, items:[
+ {id:"p-done", h:"완료된 항목", done:true, stable:true, items:[
   ["상견례","7월 3일"],
   ["청첩장·모바일청첩장 제작, 식권 출력, 부자재 구매","조립은 8/15 연휴에 진행"],
   ["사회자 섭외"],
@@ -333,10 +342,11 @@ const list=document.getElementById("list"), chips=document.getElementById("chips
 let onlyOpen=false, cur="pre";
 const isOn=(key,sec)=>key in state?!!state[key]:!!sec.done;
 
+const whoCls=w=>(w==="신부"||w==="신부측")?"bride":(w==="신랑"||w==="신랑측")?"groom":"";
 function itemLi(it,key,sec,from){
   const li=document.createElement("li");
   const note=it[1]?it[1].split("\n").map(l=>`<span class="n">${esc(l)}</span>`).join(""):"";
-  li.innerHTML=`<label for="${key}"><input type="checkbox" id="${key}"><span class="txt"><span class="t">${esc(it[0])}${it[2]?`<span class="who">${it[2]}</span>`:""}${from?`<span class="from">${from}</span>`:""}</span>${note}</span></label>`;
+  li.innerHTML=`<label for="${key}"><input type="checkbox" id="${key}"><span class="txt"><span class="t">${esc(it[0])}${it[2]?`<span class="who ${whoCls(it[2])}">${it[2]}</span>`:""}${from?`<span class="from">${from}</span>`:""}</span>${note}</span></label>`;
   const cb=li.querySelector("input");cb.checked=isOn(key,sec);li.classList.toggle("on",cb.checked);
   cb.addEventListener("change",()=>{
     state[key]=cb.checked;li.classList.toggle("on",cb.checked);save();
@@ -345,10 +355,12 @@ function itemLi(it,key,sec,from){
   return li;
 }
 const moves=()=>TABS[cur].data.some(s=>s.done);
+function hsh(t){let h=5381;for(const c of t)h=((h<<5)+h+c.codePointAt(0))|0;return (h>>>0).toString(36)}
+const keyOf=(sec,it,i)=>sec.stable?"p-"+hsh(it[0]+"|"+(it[2]||"")):sec.id+"-"+i;
 function render(){
   list.innerHTML="";chips.innerHTML="";let lastGroup=null;
   const data=TABS[cur].data, mv=moves(), moved=[];
-  if(mv)data.forEach(sec=>{if(!sec.done)sec.items.forEach((it,i)=>{const key=sec.id+"-"+i;if(isOn(key,sec))moved.push([it,key,sec])})});
+  if(mv)data.forEach(sec=>{if(!sec.done)sec.items.forEach((it,i)=>{const key=keyOf(sec,it,i);if(isOn(key,sec))moved.push([it,key,sec])})});
   data.forEach(sec=>{
     if(!sec.g){lastGroup=null}else if(sec.g!==lastGroup){const d=document.createElement("div");d.className="group-label";d.textContent=sec.g;list.appendChild(d);lastGroup=sec.g}
     const s=document.createElement("section");s.id=sec.id;
@@ -356,7 +368,7 @@ function render(){
     const ul=document.createElement("ul");
     if(mv&&sec.done)moved.forEach(([it,key,src])=>ul.appendChild(itemLi(it,key,src,src.h)));
     sec.items.forEach((it,i)=>{
-      const key=sec.id+"-"+i;
+      const key=keyOf(sec,it,i);
       if(mv&&!sec.done&&isOn(key,sec))return;
       ul.appendChild(itemLi(it,key,sec,null));
     });
@@ -387,7 +399,7 @@ function update(){
     s.querySelectorAll("li").forEach(li=>li.hidden=onlyOpen&&li.classList.contains("on"));
     s.hidden=onlyOpen&&boxes.length-d===0;
   });
-  TABS[cur].data.forEach(sec=>sec.items.forEach((_,i)=>{tot++;if(isOn(sec.id+"-"+i,sec))done++}));
+  TABS[cur].data.forEach(sec=>sec.items.forEach((it,i)=>{tot++;if(isOn(keyOf(sec,it,i),sec))done++}));
   document.querySelectorAll(".group-label").forEach(g=>{
     let n=g.nextElementSibling,any=false;while(n&&n.tagName==="SECTION"){if(!n.hidden)any=true;n=n.nextElementSibling}
     g.hidden=!any;
@@ -414,7 +426,7 @@ const conf=document.getElementById("confirm");
 document.getElementById("reset").onclick=()=>conf.hidden=false;
 document.getElementById("no").onclick=()=>conf.hidden=true;
 document.getElementById("yes").onclick=()=>{
-  TABS[cur].data.forEach(sec=>sec.items.forEach((_,i)=>{delete state[sec.id+"-"+i]}));
+  TABS[cur].data.forEach(sec=>sec.items.forEach((it,i)=>{delete state[keyOf(sec,it,i)]}));
   save();conf.hidden=true;render();
 };
 </script>
